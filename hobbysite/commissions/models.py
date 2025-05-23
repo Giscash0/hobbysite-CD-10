@@ -15,7 +15,8 @@ class Commission(models.Model):
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='open')
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
-
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='authored_commissions')
+    
     def __str__(self):
         return self.title
 

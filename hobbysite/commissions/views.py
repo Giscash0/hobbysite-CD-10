@@ -84,5 +84,5 @@ def commissions_update(request, pk):
     
     return render(request, 'commissions/form.html', context)
 
-def job_apply(request):
+def job_manage(request):
     pass
