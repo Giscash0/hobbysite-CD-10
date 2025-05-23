@@ -41,4 +41,4 @@ class Job(models.Model):
 
 class JobApplication(models.Model):
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='job')
-    
+    applicant = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='applicant')
