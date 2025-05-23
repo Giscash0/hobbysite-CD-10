@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ commission.title }}{% endblock %}
+
+{% block content %}
+    <h1>{{ commission.title }}</h1>
+    <p>Status: {{ commission.get_status_display }}</p>
+    <p>Author: {{ commission.author.display_name }}</p>
+    <p>Created: {{ commission.created_on }}</p>
+    <p>Last updated: {{ commission.updated_on }}</p>
+
+    <h3>Description</h3>
+    <p>{{ commission.description }}</p>
+
+    <h3>Jobs</h3>
+    <p>Total manpower required: {{ total_manpower }}</p>
+    <p>Open positions: {{ open_manpower }}</p>
+
+    {% for job in jobs %}
+        <div>
+            <h4>{{ job.role }}</h4>
+            <p>Status: {{ job.get_status_display }}</p>
+            <p>Manpower required: {{ job.manpower_required }}</p>
+            
+            {% if user.is_authenticated %}
+                {% if job.status == 'open' %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="job_pk" value="{{ job.pk }}">
+                        <button type="submit" name="apply_job">Apply to this Job</button>
+                    </form>
+                {% endif %}
+                
+                {% if commission.author == user.profile %}
+                    <a href="{% url 'commissions:manage' job_pk=job.pk %}">Manage Applicants</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    {% if user == commission.author.user %}
+        <a href="{% url 'commissions:update' pk=commission.pk %}">Edit Commission</a>
+    {% endif %}
+{% endblock %}
