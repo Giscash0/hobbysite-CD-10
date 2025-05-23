@@ -10,8 +10,8 @@ def commissions_list(request):
     
     if request.user.is_authenticated:
         profile = request.user.profile
-        context['my_commissions'] = profile.commissions.all()
-        context['applied_commissions'] = Commission.objects.filter(jobs__applications__applicant=profile).distinct()
+        context['my_commissions'] = profile.authored_commissions.all().order_by('-created_on')
+        context['applied_commissions'] = Commission.objects.filter(jobs__applications__applicant=profile).distinct().order_by('-created_on')
 
     return render(request, 'commissions_list.html', context)
 
