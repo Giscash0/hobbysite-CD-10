@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Commission, Comment
+from .models import Commission, Job, JobApplication
 
 class CommissionAdmin(admin.ModelAdmin):
     model = Commission
