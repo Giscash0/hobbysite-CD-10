@@ -4,8 +4,8 @@ from .models import Commission, Job, JobApplication
 class CommissionAdmin(admin.ModelAdmin):
     model = Commission
 
-class CommentAdmin(admin.ModelAdmin):
-    model = Comment
+class JobAdmin(admin.ModelAdmin):
+    model = Job
 
 admin.site.register(Commission, CommissionAdmin)
 admin.site.register(Comment, CommentAdmin)
