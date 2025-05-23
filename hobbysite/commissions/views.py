@@ -98,5 +98,25 @@ def commissions_update(request, pk):
     
     return render(request, 'commissions_update.html', context)
 
-def job_manage(request):
-    pass
+@login_required
+def job_manage(request, job_pk):
+    job = get_object_or_404(Job, pk=job_pk)
+    
+    if request.user.profile != job.commission.author:
+        return redirect('commissions:list')
+    
+    if request.method == 'POST':
+        for application in job.applications.all():
+            new_status = request.POST.get(f'status_{application.id}')
+            if new_status in ['pending', 'accepted', 'rejected']:
+                application.status = new_status
+                application.save()
+
+        accepted_count = job.applications.filter(status='accepted').count()
+        if accepted_count >= job.manpower_required:
+            job.status = 'full'
+            job.save()
+        
+        return redirect(job.commission.get_absolute_url())
+    
+    return render(request, 'commissions_manage.html', {'job': job})
