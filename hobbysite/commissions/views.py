@@ -16,8 +16,27 @@ def commission_list(request):
 
     return render(request, 'commissions_list.html', context)
 
-def commission_detail(request):
-    pass
+def commission_detail(request, pk):
+    commission = get_object_or_404(Commission, pk=pk)
+    jobs = commission.commission.all()
+    
+    total_manpower = sum(job.manpower_required for job in jobs)
+    accepted_applications = JobApplication.objects.filter(
+        job__in=jobs,
+        status='accepted'
+    ).count()
+    open_manpower = total_manpower - accepted_applications
+    
+    context = {
+        'commission': commission,
+        'jobs': jobs,
+        'total_manpower': total_manpower,
+        'open_manpower': open_manpower,
+        'job_form': JobForm(),
+        'application_form': JobApplicationForm(),
+    }
+    
+    return render(request, 'commissions_detail.html', context)
 
 def commission_create(request):
     pass
