@@ -27,6 +27,7 @@ class Commission(models.Model):
 class Job(models.Model):
     commission = models.ForeignKey(Commission, on_delete = models.CASCADE)
     role = models.CharField(max_length = 255)
+    manpower_required = models.PositiveIntegerField()
     
     class Meta:
         ordering = ['-created_on']
