@@ -9,11 +9,11 @@ class Commission(models.Model):
         ('discontinued', 'Discontinued'),
     )
 
-    title = models.CharField(max_length = 255)
-    description = models.TextField(blank = False)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=False)
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='open')
-    created_on = models.DateTimeField(auto_now_add = True)
-    updated_on = models.DateTimeField(auto_now = True)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
@@ -25,9 +25,15 @@ class Commission(models.Model):
         ordering = ['created_on']
 
 class Job(models.Model):
-    commission = models.ForeignKey(Commission, on_delete = models.CASCADE)
-    role = models.CharField(max_length = 255)
+    STATUS_CHOICES = (
+        ('open', 'Open'),
+        ('full', 'Full'),
+    )
+
+    commission = models.ForeignKey(Commission, on_delete=models.CASCADE)
+    role = models.CharField(max_length=255)
     manpower_required = models.PositiveIntegerField()
-    
+    status = models.CharField(max_length=4, choices=STATUS_CHOICES, default='open')
+
     class Meta:
         ordering = ['-created_on']
