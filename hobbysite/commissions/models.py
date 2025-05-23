@@ -30,7 +30,7 @@ class Job(models.Model):
         ('full', 'Full'),
     )
 
-    commission = models.ForeignKey(Commission, on_delete=models.CASCADE)
+    commission = models.ForeignKey(Commission, on_delete=models.CASCADE, related_name='commission')
     role = models.CharField(max_length=255)
     manpower_required = models.PositiveIntegerField()
     status = models.CharField(max_length=4, choices=STATUS_CHOICES, default='open')
@@ -39,4 +39,4 @@ class Job(models.Model):
         ordering = ['status', '-manpower_required', 'role']
 
 class JobApplication(models.Model):
-    
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='job')
