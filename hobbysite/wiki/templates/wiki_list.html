@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        <ul>
+            {% for article in user_articles %}
+                <li><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% for category, articles in articles_by_category %}
+        <p> {{ category.name }} </p>
+        <ul>
+            {% for article in articles %}
+                {% if article.author != user %}
+                    <li><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endfor %}
+    {% if user.is_authenticated %}
+        <a href="{% url 'wiki:article_create' %}">Create an article</a>
+    {% endif %}
+{% endblock %}
