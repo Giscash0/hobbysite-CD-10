@@ -3,3 +3,18 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from .models import Commission, Job, JobApplication
 from .forms import CommissionForm, JobForm, JobApplicationForm
+
+def commission_list(request):
+    pass
+
+def commission_detail(request):
+    pass
+
+def commission_create(request):
+    pass
+
+def commission_update(request):
+    pass
+
+def job_apply(request):
+    pass
