@@ -18,7 +18,7 @@ def commissions_list(request):
 
 def commissions_detail(request, pk):
     commission = get_object_or_404(Commission, pk=pk)
-    jobs = commission.commission.all()
+    jobs = commission.jobs.all()
     
     total_manpower = sum(job.manpower_required for job in jobs)
     accepted_applications = JobApplication.objects.filter(
@@ -27,6 +27,17 @@ def commissions_detail(request, pk):
     ).count()
     open_manpower = total_manpower - accepted_applications
     
+    if request.method == 'POST' and 'apply_job' in request.POST:
+        job_pk = request.POST.get('job_pk')
+        job = get_object_or_404(Job, pk=job_pk)
+        if job.status == 'open':
+            JobApplication.objects.create(
+                job=job,
+                applicant=request.user.profile,
+                status='pending'
+            )
+            return redirect('commissions:detail', pk=pk)
+
     context = {
         'commission': commission,
         'jobs': jobs,
