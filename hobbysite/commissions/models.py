@@ -26,6 +26,7 @@ class Commission(models.Model):
 
 class Job(models.Model):
     commission = models.ForeignKey(Commission, on_delete = models.CASCADE)
+    role = models.CharField(max_length = 255)
     entry = models.TextField(blank = False)
     created_on = models.DateTimeField(auto_now_add = True)
     updated_on = models.DateTimeField(auto_now = True)
