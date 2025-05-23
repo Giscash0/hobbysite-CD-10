@@ -37,3 +37,6 @@ class Job(models.Model):
 
     class Meta:
         ordering = ['status', '-manpower_required', 'role']
+
+class JobApplication(models.Model):
+    
