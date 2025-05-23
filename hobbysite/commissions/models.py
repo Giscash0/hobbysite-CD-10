@@ -12,7 +12,6 @@ class Commission(models.Model):
     title = models.CharField(max_length = 255)
     description = models.TextField(blank = False)
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='open')
-    people_required = models.PositiveBigIntegerField()
     created_on = models.DateTimeField(auto_now_add = True)
     updated_on = models.DateTimeField(auto_now = True)
 
