@@ -4,7 +4,7 @@ from django.urls import reverse
 from .models import Commission, Job, JobApplication
 from .forms import CommissionForm, JobForm, JobApplicationForm
 
-def commission_list(request):
+def commissions_list(request):
     commissions = Commission.objects.all().order_by('status', '-created_on')
     
     context = {'commissions': commissions,}
@@ -16,7 +16,7 @@ def commission_list(request):
 
     return render(request, 'commissions_list.html', context)
 
-def commission_detail(request, pk):
+def commissions_detail(request, pk):
     commission = get_object_or_404(Commission, pk=pk)
     jobs = commission.commission.all()
     
@@ -38,10 +38,10 @@ def commission_detail(request, pk):
     
     return render(request, 'commissions_detail.html', context)
 
-def commission_create(request):
+def commissions_create(request):
     pass
 
-def commission_update(request):
+def commissions_update(request):
     pass
 
 def job_apply(request):
