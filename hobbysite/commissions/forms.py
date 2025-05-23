@@ -10,7 +10,12 @@ class CommissionForm(forms.ModelForm):
         }
 
 class JobForm(forms.ModelForm):
-    pass
+    class Meta:
+        model = Job
+        fields = ['role', 'manpower_required', 'status']
+        widgets = {
+            'status': forms.Select(choices=Job.STATUS_CHOICES),
+        }
 
 class JobApplicationForm(forms.ModelForm):
     pass
