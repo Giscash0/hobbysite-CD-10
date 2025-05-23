@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from user_management.models import Profile
 
 class Commission(models.Model):
     STATUS_CHOICES = (
@@ -40,3 +41,4 @@ class Job(models.Model):
 
 class JobApplication(models.Model):
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='job')
+    
