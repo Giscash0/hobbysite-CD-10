@@ -5,7 +5,16 @@ from .models import Commission, Job, JobApplication
 from .forms import CommissionForm, JobForm, JobApplicationForm
 
 def commission_list(request):
-    pass
+    commissions = Commission.objects.all().order_by('status', '-created_on')
+    
+    context = {'commissions': commissions,}
+    
+    if request.user.is_authenticated:
+        profile = request.user.profile
+        context['my_commissions'] = profile.commissions.all()
+        context['applied_commissions'] = Commission.objects.filter(jobs__applications__applicant=profile).distinct()
+
+    return render(request, 'commissions_list.html', context)
 
 def commission_detail(request):
     pass
