@@ -40,5 +40,11 @@ class Job(models.Model):
         ordering = ['status', '-manpower_required', 'role']
 
 class JobApplication(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected')
+    )
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='job')
     applicant = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='applicant')
+    status = models.CharField(max_length=8, choices=STATUS_CHOICES, default='pending')
