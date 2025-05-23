@@ -1,17 +1,122 @@
-from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
-from .models import Comment, Commission
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Commission, Job, JobApplication
+from .forms import CommissionForm, JobForm, JobApplicationForm
 
-class CommentListView(ListView):
-    model = Commission
-    template_name = 'comment_list.html'
-    context_object_name = 'commissions'
-
-class CommentDetailView(DetailView):
-    model = Commission
-    template_name = 'comment_entry.html'
+def commissions_list(request):
+    commissions = Commission.objects.all().order_by('status', '-created_on')
     
-    def get_context_data(self, **args):
-        context = super().get_context_data(**args)
-        context['comments'] = Comment.objects.filter(commission=self.object)
-        return context
+    context = {'commissions': commissions,}
+    
+    if request.user.is_authenticated:
+        profile = request.user.profile
+        context['my_commissions'] = profile.authored_commissions.all().order_by('-created_on')
+        context['applied_commissions'] = Commission.objects.filter(jobs__applications__applicant=profile).distinct().order_by('-created_on')
+
+    return render(request, 'commissions_list.html', context)
+
+def commissions_detail(request, pk):
+    commission = get_object_or_404(Commission, pk=pk)
+    jobs = commission.jobs.all()
+    
+    total_manpower = sum(job.manpower_required for job in jobs)
+    accepted_applications = JobApplication.objects.filter(
+        job__in=jobs,
+        status='accepted'
+    ).count()
+    open_manpower = total_manpower - accepted_applications
+    
+    if request.method == 'POST' and 'apply_job' in request.POST:
+        job_pk = request.POST.get('job_pk')
+        job = get_object_or_404(Job, pk=job_pk)
+        if job.status == 'open':
+            JobApplication.objects.create(
+                job=job,
+                applicant=request.user.profile,
+                status='pending'
+            )
+            return redirect('commissions:detail', pk=pk)
+
+    context = {
+        'commission': commission,
+        'jobs': jobs,
+        'total_manpower': total_manpower,
+        'open_manpower': open_manpower,
+        'job_form': JobForm(),
+        'application_form': JobApplicationForm(),
+    }
+    
+    return render(request, 'commissions_detail.html', context)
+
+@login_required
+def commissions_create(request):
+    if request.method == 'POST':
+        form = CommissionForm(request.POST)
+        if form.is_valid():
+            commission = form.save(commit=False)
+            commission.author = request.user.profile
+            commission.save()
+            return redirect(commission.get_absolute_url())
+    else:
+        form = CommissionForm()
+    
+    return render(request, 'commissions_create.html', {'form': form})
+
+@login_required
+def commissions_update(request, pk):
+    commission = get_object_or_404(Commission, pk=pk)
+    
+    if request.user.profile != commission.author:
+        return redirect('commissions:list')
+    
+    if request.method == 'POST':
+        form = CommissionForm(request.POST, instance=commission)
+        job_form = JobForm(request.POST)
+        
+        if form.is_valid():
+            form.save()
+            
+            if job_form.is_valid():
+                job = job_form.save(commit=False)
+                job.commission = commission
+                job.save()
+            
+            if not commission.jobs.filter(status='open').exists():
+                commission.status = 'full'
+                commission.save()
+            
+            return redirect(commission.get_absolute_url())
+    else:
+        form = CommissionForm(instance=commission)
+        job_form = JobForm()
+    
+    context = {
+        'form': form,
+        'job_form': job_form,
+        'commission': commission,
+    }
+    
+    return render(request, 'commissions_update.html', context)
+
+@login_required
+def job_manage(request, job_pk):
+    job = get_object_or_404(Job, pk=job_pk)
+    
+    if request.user.profile != job.commission.author:
+        return redirect('commissions:list')
+    
+    if request.method == 'POST':
+        for application in job.applications.all():
+            new_status = request.POST.get(f'status_{application.id}')
+            if new_status in ['pending', 'accepted', 'rejected']:
+                application.status = new_status
+                application.save()
+
+        accepted_count = job.applications.filter(status='accepted').count()
+        if accepted_count >= job.manpower_required:
+            job.status = 'full'
+            job.save()
+        
+        return redirect(job.commission.get_absolute_url())
+    
+    return render(request, 'commissions_manage.html', {'job': job})

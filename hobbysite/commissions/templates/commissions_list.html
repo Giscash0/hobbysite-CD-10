@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Commissions{% endblock %}
+
+{% block content %}
+    <h1>Commissions</h1>
+
+    {% if user.is_authenticated %}
+        <a href="{% url 'commissions:create' %}">Create New Commission</a>
+
+        {% if my_commissions %}
+            <h2>My Commissions</h2>
+            {% for commission in my_commissions %}
+                <div>
+                    <h3><a href="{{ commission.get_absolute_url }}">{{ commission.title }}</a></h3>
+                    <p>Status: {{ commission.get_status_display }}</p>
+                    <p>{{ commission.description }}</p>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if applied_commissions %}
+            <h2>Applied Commissions</h2>
+            {% for commission in applied_commissions %}
+                <div>
+                    <h3><a href="{{ commission.get_absolute_url }}">{{ commission.title }}</a></h3>
+                    <p>Status: {{ commission.get_status_display }}</p>
+                    <p>{{ commission.description }}</p>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+
+    <h2>All Commissions</h2>
+        {% for commission in commissions %}
+            <div>
+                <h3><a href="{{ commission.get_absolute_url }}">{{ commission.title }}</a></h3>
+                <p>Status: {{ commission.get_status_display }}</p>
+                <p>{{ commission.description }}</p>
+            </div>
+        {% empty %}
+            <p>No commissions available.</p>
+        {% endfor %}
+{% endblock %}
