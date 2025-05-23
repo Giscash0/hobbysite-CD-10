@@ -36,4 +36,4 @@ class Job(models.Model):
     status = models.CharField(max_length=4, choices=STATUS_CHOICES, default='open')
 
     class Meta:
-        ordering = ['-created_on']
+        ordering = ['status', '-manpower_required', 'role']
