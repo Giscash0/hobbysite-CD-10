@@ -18,4 +18,6 @@ class JobForm(forms.ModelForm):
         }
 
 class JobApplicationForm(forms.ModelForm):
-    pass
+    class Meta:
+        model = JobApplication
+        fields = []
