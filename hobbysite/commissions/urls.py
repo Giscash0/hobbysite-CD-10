@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CommentListView, CommentDetailView
+from .views import commissions_list, commissions_detail, commissions_create, commissions_update, job_manage
 
 urlpatterns = [
     path('list/', CommentListView.as_view(), name = 'comment_list'), 
