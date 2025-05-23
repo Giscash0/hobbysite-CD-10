@@ -38,8 +38,19 @@ def commissions_detail(request, pk):
     
     return render(request, 'commissions_detail.html', context)
 
+@login_required
 def commissions_create(request):
-    pass
+    if request.method == 'POST':
+        form = CommissionForm(request.POST)
+        if form.is_valid():
+            commission = form.save(commit=False)
+            commission.author = request.user.profile
+            commission.save()
+            return redirect(commission.get_absolute_url())
+    else:
+        form = CommissionForm()
+    
+    return render(request, 'commissions/form.html', {'form': form})
 
 def commissions_update(request):
     pass
