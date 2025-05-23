@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 from .models import Commission, Job, JobApplication
 from .forms import CommissionForm, JobForm, JobApplicationForm
 
@@ -61,10 +60,14 @@ def commissions_create(request):
     else:
         form = CommissionForm()
     
-    return render(request, 'commissions/form.html', {'form': form})
+    return render(request, 'commissions_create.html', {'form': form})
 
+@login_required
 def commissions_update(request, pk):
     commission = get_object_or_404(Commission, pk=pk)
+    
+    if request.user.profile != commission.author:
+        return redirect('commissions:list')
     
     if request.method == 'POST':
         form = CommissionForm(request.POST, instance=commission)
@@ -78,8 +81,8 @@ def commissions_update(request, pk):
                 job.commission = commission
                 job.save()
             
-            if not commission.jobs.filter(status='Open').exists():
-                commission.status = 'Full'
+            if not commission.jobs.filter(status='open').exists():
+                commission.status = 'full'
                 commission.save()
             
             return redirect(commission.get_absolute_url())
@@ -93,7 +96,7 @@ def commissions_update(request, pk):
         'commission': commission,
     }
     
-    return render(request, 'commissions/form.html', context)
+    return render(request, 'commissions_update.html', context)
 
 def job_manage(request):
     pass
