@@ -52,8 +52,37 @@ def commissions_create(request):
     
     return render(request, 'commissions/form.html', {'form': form})
 
-def commissions_update(request):
-    pass
+def commissions_update(request, pk):
+    commission = get_object_or_404(Commission, pk=pk)
+    
+    if request.method == 'POST':
+        form = CommissionForm(request.POST, instance=commission)
+        job_form = JobForm(request.POST)
+        
+        if form.is_valid():
+            form.save()
+            
+            if job_form.is_valid():
+                job = job_form.save(commit=False)
+                job.commission = commission
+                job.save()
+            
+            if not commission.jobs.filter(status='Open').exists():
+                commission.status = 'Full'
+                commission.save()
+            
+            return redirect(commission.get_absolute_url())
+    else:
+        form = CommissionForm(instance=commission)
+        job_form = JobForm()
+    
+    context = {
+        'form': form,
+        'job_form': job_form,
+        'commission': commission,
+    }
+    
+    return render(request, 'commissions/form.html', context)
 
 def job_apply(request):
     pass
